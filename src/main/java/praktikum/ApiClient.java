@@ -3,10 +3,12 @@ package praktikum;
 import com.google.gson.Gson;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import io.qameta.allure.Step; // Import the Step annotation
 import static io.restassured.RestAssured.given;
 
 public class ApiClient {
 
+    @Step("Регистрация пользователя")
     public Response createUser(String email, String password, String name) {
         return given()
                 .contentType("application/json")
@@ -16,6 +18,7 @@ public class ApiClient {
                 .post("/api/auth/register");
     }
 
+    @Step("Логин пользователя")
     public Response loginUser(String email, String password) {
         return given()
                 .contentType("application/json")
@@ -25,6 +28,7 @@ public class ApiClient {
                 .post("/api/auth/login");
     }
 
+    @Step("Удаление пользователя")
     public Response deleteUser(String accessToken) {
         return given()
                 .contentType("application/json")
@@ -33,14 +37,14 @@ public class ApiClient {
                 .when()
                 .delete("/api/auth/user");
     }
+
+    @Step("Изменения данных пользователя")
     public Response updateUser(String accessToken, String email, String name) {
-        // Создаем запрос с заголовком авторизации только если токен не null
         RequestSpecification request = given()
                 .contentType("application/json")
                 .body(String.format("{\"email\": \"%s\", \"name\": \"%s\"}", email, name))
                 .baseUri(EnvConfig.BASE_URL);
 
-        // Добавляем заголовок авторизации, если токен не null
         if (accessToken != null) {
             request.header("Authorization", accessToken);
         }
@@ -49,6 +53,7 @@ public class ApiClient {
                 .patch("/api/auth/user");
     }
 
+    @Step("Создание заказа")
     public Response createOrder(String accessToken, String[] ingredients) {
         Gson gson = new Gson();
         String jsonBody = gson.toJson(new OrderRequest(ingredients));
@@ -66,7 +71,6 @@ public class ApiClient {
                 .post("/api/orders");
     }
 
-    // Вспомогательный класс для сериализации
     private static class OrderRequest {
         private String[] ingredients;
 
@@ -74,7 +78,9 @@ public class ApiClient {
             this.ingredients = ingredients;
         }
     }
-        public Response getOrders(String accessToken) {
+
+    @Step("Получение списка заказов")
+    public Response getOrders(String accessToken) {
         RequestSpecification request = given()
                 .contentType("application/json")
                 .baseUri(EnvConfig.BASE_URL);
