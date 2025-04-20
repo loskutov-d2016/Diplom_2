@@ -34,8 +34,8 @@ public class LoginApiTests {
 
     @Test
     public void loginWithInvalidCredentials() {
-        String invalidEmail = "invalid-email@yandex.ru";
-        String invalidPassword = "wrong-password";
+        String invalidEmail = faker.internet().emailAddress();
+        String invalidPassword = faker.internet().password();
 
         // Логин с неверным логином и паролем
         Response loginResponse = apiClient.loginUser(invalidEmail, invalidPassword);

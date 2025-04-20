@@ -3,16 +3,25 @@ package praktikum;
 import com.google.gson.Gson;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import io.qameta.allure.Step; // Import the Step annotation
+import io.qameta.allure.Step;
 import static io.restassured.RestAssured.given;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ApiClient {
 
+    private Gson gson = new Gson();
+
     @Step("Регистрация пользователя")
     public Response createUser(String email, String password, String name) {
+        Map<String, String> user = new HashMap<>();
+        user.put("email", email);
+        user.put("password", password);
+        user.put("name", name);
+
         return given()
                 .contentType("application/json")
-                .body(String.format("{\"email\": \"%s\", \"password\": \"%s\", \"name\": \"%s\"}", email, password, name))
+                .body(gson.toJson(user))
                 .baseUri(EnvConfig.BASE_URL)
                 .when()
                 .post("/api/auth/register");
@@ -20,9 +29,13 @@ public class ApiClient {
 
     @Step("Логин пользователя")
     public Response loginUser(String email, String password) {
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("email", email);
+        credentials.put("password", password);
+
         return given()
                 .contentType("application/json")
-                .body(String.format("{\"email\": \"%s\", \"password\": \"%s\"}", email, password))
+                .body(gson.toJson(credentials))
                 .baseUri(EnvConfig.BASE_URL)
                 .when()
                 .post("/api/auth/login");
@@ -40,9 +53,13 @@ public class ApiClient {
 
     @Step("Изменения данных пользователя")
     public Response updateUser(String accessToken, String email, String name) {
+        Map<String, String> userUpdates = new HashMap<>();
+        userUpdates.put("email", email);
+        userUpdates.put("name", name);
+
         RequestSpecification request = given()
                 .contentType("application/json")
-                .body(String.format("{\"email\": \"%s\", \"name\": \"%s\"}", email, name))
+                .body(gson.toJson(userUpdates))
                 .baseUri(EnvConfig.BASE_URL);
 
         if (accessToken != null) {
@@ -55,12 +72,12 @@ public class ApiClient {
 
     @Step("Создание заказа")
     public Response createOrder(String accessToken, String[] ingredients) {
-        Gson gson = new Gson();
-        String jsonBody = gson.toJson(new OrderRequest(ingredients));
+        Map<String, String[]> orderRequest = new HashMap<>();
+        orderRequest.put("ingredients", ingredients);
 
         RequestSpecification request = given()
                 .contentType("application/json")
-                .body(jsonBody)
+                .body(gson.toJson(orderRequest))
                 .baseUri(EnvConfig.BASE_URL);
 
         if (accessToken != null) {
@@ -69,14 +86,6 @@ public class ApiClient {
 
         return request.when()
                 .post("/api/orders");
-    }
-
-    private static class OrderRequest {
-        private String[] ingredients;
-
-        public OrderRequest(String[] ingredients) {
-            this.ingredients = ingredients;
-        }
     }
 
     @Step("Получение списка заказов")
@@ -91,5 +100,10 @@ public class ApiClient {
 
         return request.when()
                 .get("/api/orders");
+    }
+
+    @Step("Выбор ингридиента")
+    public String createIngredient() {
+        return "61c0c5a71d1f82001bdaaa6d"; // Замените на реальный идентификатор
     }
 }
