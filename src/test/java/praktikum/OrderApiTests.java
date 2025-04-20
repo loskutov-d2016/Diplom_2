@@ -30,23 +30,6 @@ public class OrderApiTests {
         initialAccessToken = createResponse.jsonPath().getString("accessToken");
     }
 
-//    @Test
-//    public void createOrderWithAuthorization() {
-//        // Логин под существующим пользователем
-//        Response loginResponse = apiClient.loginUser(userEmail, userPassword);
-//        loginResponse.then().statusCode(200);
-//        orderAccessToken = loginResponse.jsonPath().getString("accessToken");
-//
-//        // Идентификаторы ингредиентов
-//        String[] ingredients = {"61c0c5a71d1f82001bdaaa6d"};
-//
-//        // Создание заказа с авторизацией
-//        Response orderResponse = apiClient.createOrder(orderAccessToken, ingredients);
-//        orderResponse.then().statusCode(200);
-//        orderResponse.then().body("success", equalTo(true));
-//        orderResponse.then().body("name", equalTo("Флюоресцентный бургер"));
-//        orderResponse.then().body("order.ingredients[0]._id", equalTo(ingredients[0]));
-//    }
     @Test
     public void createOrderWithAuthorization() {
         // Логин под существующим пользователем
